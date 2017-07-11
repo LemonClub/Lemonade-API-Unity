@@ -156,7 +156,7 @@ namespace LA
             {
                 WWWForm form = new WWWForm();
                 form.AddField("token", GAME.game_token);
-                form.AddField("lStr", Regex.Replace(lStr, @"[^a-zA-Z0-9*]", "", RegexOptions.Singleline));
+                form.AddField("lStr", Regex.Replace(lStr, @"[^a-zA-Z0-9*, ]", "", RegexOptions.Singleline));
                 form.AddField("user", Regex.Replace(userToken, @"[^a-zA-Z0-9=]", "", RegexOptions.Singleline));
 
                 WWW w = new WWW("http://lemontree.dothome.co.kr/dbCustom", form);
