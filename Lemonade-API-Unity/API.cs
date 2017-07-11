@@ -162,8 +162,11 @@ namespace LA
                 WWW w = new WWW("http://lemontree.dothome.co.kr/dbCustom", form);
 
                 yield return w;
-
-                Debug.Log("Custom Database JSON Return : " + w.text);
+                
+                if (w.text[w.text.Length - 1].Equals('}'))
+                    Debug.Log("Custom Database JSON Return : " + w.text);
+                else
+                    Debug.LogError("Wrong lStr, Rewrite GetDatabaseC()'s 1th param");
             }
         }
 
