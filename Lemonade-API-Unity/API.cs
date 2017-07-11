@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace LA
@@ -62,7 +63,7 @@ namespace LA
         /// </summary>
         /// <param name="userToken">유저 토큰</param>
         /// <param name="func">성공적으로 마쳤을때 불러올 함수</param>
-        public IEnumerator getPlayerInfo(initDelegate func)
+        /* public IEnumerator getPlayerInfo(initDelegate func)
         {
             // GAME.init 이 true 가 되기보다 getPlayerInfo 더 빠를수도 있음을 방지
             while (!GAME.init)
@@ -73,7 +74,7 @@ namespace LA
                 WWWForm form = new WWWForm();
                 form.AddField("game_stage", GAME.game_stage);
                 form.AddField("user_token", LA.User.Lemon._user.playerToken);
-                WWW w = new WWW("http://lemontree.dothome.co.kr/get_user_info.php", form);
+                WWW w = new WWW("http://lemontree.dothome.co.kr/get_user_info", form);
 
                 yield return w;
 
@@ -99,7 +100,7 @@ namespace LA
                     func(LA.User.Lemon._user);
                 }
             }
-        }
+        } */
 
         /// <summary>
         /// 유저 정보 받아오기 ( 어느 유저 타겟에 대한 정보 )
@@ -117,10 +118,10 @@ namespace LA
                 WWWForm form = new WWWForm();
                 form.AddField("game_stage", GAME.game_stage);
                 form.AddField("user_token", userToken);
-                WWW w = new WWW("http://lemontree.dothome.co.kr/get_user_info.php", form);
+                WWW w = new WWW("http://lemontree.dothome.co.kr/get_user_info", form);
 
                 yield return w;
-                
+
                 if (!w.text.Equals(""))
                 {
                     LA.User.UserInfo uinfo = new LA.User.UserInfo();
@@ -146,6 +147,26 @@ namespace LA
             }
         }
 
+        public IEnumerator getDatabaseC(string lStr, string userToken)
+        {
+            while (!GAME.init)
+                yield return null;
+
+            if (GAME.init)
+            {
+                WWWForm form = new WWWForm();
+                form.AddField("token", GAME.game_token);
+                form.AddField("lStr", Regex.Replace(lStr, @"[^a-zA-Z0-9*]", "", RegexOptions.Singleline));
+                form.AddField("user", Regex.Replace(userToken, @"[^a-zA-Z0-9=]", "", RegexOptions.Singleline));
+
+                WWW w = new WWW("http://lemontree.dothome.co.kr/dbCustom", form);
+
+                yield return w;
+
+                Debug.Log("Custom Database JSON Return : " + w.text);
+            }
+        }
+
         /// <summary>
         /// 게임 초기화
         /// </summary>
@@ -154,11 +175,11 @@ namespace LA
         public IEnumerator init(string token)
         {
             GAME.game_token = token;
-            
+
             // 게임 보안 단계를 알아오는 중
             WWWForm form = new WWWForm();
-            form.AddField("token", token);
-            WWW w = new WWW("http://lemontree.dothome.co.kr/get_game_stage.php", form);
+            form.AddField("token", GAME.game_token);
+            WWW w = new WWW("http://lemontree.dothome.co.kr/get_game_stage", form);
 
             yield return w;
             GAME.init = true;
