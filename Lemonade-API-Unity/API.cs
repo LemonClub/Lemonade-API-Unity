@@ -7,6 +7,7 @@ namespace LA
 {
     public class API
     {
+        string kStr, vStr;
         public delegate void initDelegate(LA.User.UserInfo dicArg);
 
         /// <summary>
@@ -147,6 +148,12 @@ namespace LA
             }
         }
 
+        /// <summary>
+        /// Custom Database 가져오기
+        /// </summary>
+        /// <param name="lStr">가져올 칼럼</param>
+        /// <param name="userToken">유저의 토큰</param>
+        /// <returns></returns>
         public IEnumerator getDatabaseC(string lStr, string userToken)
         {
             while (!GAME.init)
@@ -167,6 +174,45 @@ namespace LA
                     Debug.Log("Custom Database JSON Return : " + w.text);
                 else
                     Debug.LogError("Wrong lStr, Rewrite GetDatabaseC()'s 1th param");
+            }
+        }
+
+        /// <summary>
+        /// Custom Database 추가하기
+        /// </summary>
+        /// <param name="dic">추가할 항목들</param>
+        /// <returns></returns>
+        public IEnumerator addDatabaseC(Dictionary<string, object> dic)
+        {
+            while (!GAME.init)
+                yield return null;
+
+            if (GAME.init)
+            {
+                kStr = "";
+                vStr = "";
+
+                foreach (KeyValuePair<string, object> item in dic)
+                {
+                    kStr += item.Key + ", ";
+                    vStr += item.Value + ", ";
+                }
+                
+                kStr = kStr.Remove(kStr.Length - 2);
+                vStr = vStr.Remove(vStr.Length - 2);
+
+                WWWForm form = new WWWForm();
+                form.AddField("token", GAME.game_token);
+                form.AddField("kStr", Regex.Replace(kStr, @"[^a-zA-Z0-9, ]", "", RegexOptions.Singleline));
+                form.AddField("vStr", Regex.Replace(vStr, @"[^a-zA-Z0-9, ]", "", RegexOptions.Singleline));
+                form.AddField("user", Regex.Replace(LA.User.Lemon._user.playerToken, @"[^a-zA-Z0-9=]", "", RegexOptions.Singleline));
+                
+                WWW w = new WWW("http://lemontree.dothome.co.kr/dbCustomInsert", form);
+
+                yield return w;
+
+                if (w.text.Equals("ERROR"))
+                    Debug.LogWarning("ALREADY ADDED USER");
             }
         }
 
