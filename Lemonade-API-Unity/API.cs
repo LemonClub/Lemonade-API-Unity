@@ -7,7 +7,7 @@ namespace LA
 {
     public class API
     {
-        string kStr, vStr;
+        string kStr, vStr, lStr;
         public delegate void initDelegate(LA.User.UserInfo dicArg);
 
         /// <summary>
@@ -208,6 +208,36 @@ namespace LA
                 form.AddField("user", Regex.Replace(LA.User.Lemon._user.playerToken, @"[^a-zA-Z0-9=]", "", RegexOptions.Singleline));
                 
                 WWW w = new WWW("http://lemontree.dothome.co.kr/dbCustomInsert", form);
+
+                yield return w;
+
+                if (w.text.Equals("ERROR"))
+                    Debug.LogWarning("ALREADY ADDED USER");
+            }
+        }
+
+        public IEnumerator fixDatabaseC(Dictionary<string, object> dic)
+        {
+            while (!GAME.init)
+                yield return null;
+
+            if (GAME.init)
+            {
+                lStr = "";
+
+                foreach (KeyValuePair<string, object> item in dic)
+                {
+                    lStr += item.Key + "=" + item.Value + ", ";
+                }
+
+                lStr = lStr.Remove(lStr.Length - 2);
+
+                WWWForm form = new WWWForm();
+                form.AddField("token", GAME.game_token);
+                form.AddField("lStr", Regex.Replace(lStr, @"[^a-zA-Z0-9, =]", "", RegexOptions.Singleline));
+                form.AddField("user", Regex.Replace(LA.User.Lemon._user.playerToken, @"[^a-zA-Z0-9=]", "", RegexOptions.Singleline));
+
+                WWW w = new WWW("http://lemontree.dothome.co.kr/dbCustomUpdate", form);
 
                 yield return w;
 
